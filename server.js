@@ -13,7 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Google Sheets configuration
-const SHEET_ID = "1SvadqMvXrkVqaQtxdMPjBcGnudFnmt2mz4CO9eAUiG0";
+const SHEET_ID = "1WEAI_sOk0Af45ZkLIv8pW1Jl9YxRaV86DSS1mb_-x5k";
 const SHEET_NAME = "Foaie1";
 
 // Middleware
