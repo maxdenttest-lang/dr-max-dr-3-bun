@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>DrMax - Sistem de Programări</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #0d7377;
+        --primary-light: #14919b;
+        --danger: #ef4444;
+        --success: #10b981;
+        --background: #ffffff;
+        --surface: rgba(255, 255, 255, 0.7);
+        --surface-dark: rgba(255, 255, 255, 0.5);
+        --border: rgba(255, 255, 255, 0.2);
+        --text-primary: #111827;
+        --text-secondary: #6b7280;
+        --text-tertiary: #9ca3af;
+        --header-bg: linear-gradient(135deg, #0d7377 0%, #14919b 100%);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background-color: var(--background);
+        color: var(--text-primary);
+        line-height: 1.5;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      /* Header - Premium Colored Panel */
+      .header {
+        background: var(--header-bg);
+        padding: 3.5rem 1rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: 0 12px 40px 0 rgba(13, 115, 119, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+      }
+
+      .header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -5%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+        border-radius: 50%;
+      }
+
+      .header-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .header-badge {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .header-icons {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .header-icon {
+        font-size: 2rem;
+        opacity: 0.9;
+        animation: float 3s ease-in-out infinite;
+      }
+
+      .header-icon:nth-child(2) {
+        animation-delay: 0.3s;
+      }
+
+      .header-icon:nth-child(3) {
+        animation-delay: 0.6s;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+      }
+
+      .header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.02em;
+        color: #ffffff;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .header p {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
+        letter-spacing: 0.3px;
+      }
+
+      .header-features {
+        display: flex;
+        justify-content: center;
+        gap: 2.5rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .header-feature {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.85);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .header-feature::before {
+        content: '✓';
+        font-weight: 700;
+        font-size: 1rem;
+      }
+
+      /* Glass Buttons */
+      .button {
+        background: var(--surface);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--border);
+        color: var(--primary);
+        padding: 0.875rem 1.75rem;
+        border-radius: 1rem;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
+        box-shadow: 0 8px 32px 0 rgba(13, 115, 119, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s ease;
+      }
+
+      .button:hover::before {
+        left: 100%;
+      }
+
+      .button:hover {
+        background: rgba(255, 255, 255, 0.9);
+        border-color: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 12px 40px 0 rgba(13, 115, 119, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .button:active {
+        transform: scale(0.98);
+      }
+
+      .button-danger {
+        color: var(--danger);
+      }
+
+      .button-danger:hover {
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 12px 40px 0 rgba(239, 68, 68, 0.2);
+      }
+
+      .button-group {
+        display: flex;
+        gap: 1rem;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        animation: fadeIn 0.3s ease;
+        backdrop-filter: blur(4px);
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background: var(--surface);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--border);
+        padding: 2.5rem;
+        border-radius: 2rem;
+        width: 90%;
+        max-width: 550px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px 0 rgba(13, 115, 119, 0.3);
+        animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(30px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(13, 115, 119, 0.1);
+        padding-bottom: 1rem;
+      }
+
+      .modal-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .close-btn {
+        background: var(--surface-dark);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--border);
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: all 0.2s ease;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+
+      .close-btn:hover {
+        background: rgba(255, 255, 255, 0.8);
+        color: var(--text-primary);
+      }
+
+      /* Form */
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.875rem;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        color: var(--text-primary);
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+
+      .form-group input::placeholder,
+      .form-group select::placeholder,
+      .form-group textarea::placeholder {
+        color: var(--text-tertiary);
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.8);
+        border-color: rgba(13, 115, 119, 0.4);
+        box-shadow: 0 0 0 4px rgba(13, 115, 119, 0.1);
+      }
+
+      /* Appointments List */
+      .appointments-list {
+        display: grid;
+        gap: 1.25rem;
+        margin: 2rem 0;
+      }
+
+      .appointment-card {
+        background: var(--surface);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--border);
+        border-radius: 1.5rem;
+        padding: 1.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 32px 0 rgba(13, 115, 119, 0.1);
+      }
+
+      .appointment-card:hover {
+        background: rgba(255, 255, 255, 0.85);
+        border-color: rgba(13, 115, 119, 0.3);
+        box-shadow: 0 12px 40px 0 rgba(13, 115, 119, 0.2);
+        transform: translateY(-2px);
+      }
+
+      .appointment-info {
+        flex: 1;
+      }
+
+      .appointment-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+      }
+
+      .appointment-detail {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+      }
+
+      .appointment-actions {
+        display: flex;
+        gap: 0.75rem;
+      }
+
+      .delete-btn {
+        background: var(--surface-dark);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: var(--danger);
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.875rem;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+      }
+
+      .delete-btn:hover {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.5);
+        box-shadow: 0 8px 24px 0 rgba(239, 68, 68, 0.15);
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+      }
+
+      .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.6;
+      }
+
+      .empty-state p {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+
+      .empty-state p:last-child {
+        font-size: 0.9rem;
+        color: var(--text-tertiary);
+      }
+
+      /* Loading */
+      .loading {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-secondary);
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(13, 115, 119, 0.2);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 0.75rem;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        padding: 1.25rem 2rem;
+        border-radius: 1rem;
+        color: white;
+        font-weight: 600;
+        animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 2000;
+        box-shadow: 0 12px 40px 0 rgba(13, 115, 119, 0.3);
+        font-size: 0.95rem;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      @keyframes slideInUp {
+        from {
+          transform: translateY(120px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .toast.success {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 184, 145, 0.9) 100%);
+      }
+
+      .toast.error {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%);
+      }
+
+      /* Responsive */
+      @media (max-width: 640px) {
+        .header {
+          padding: 2rem 1rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .header-icons {
+          gap: 1.5rem;
+        }
+
+        .header-icon {
+          font-size: 1.5rem;
+        }
+
+        .header-features {
+          gap: 1.5rem;
+          flex-direction: column;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .appointment-card {
+          flex-direction: column;
+          border-radius: 1.25rem;
+        }
+
+        .button-group {
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+
+        .button {
+          width: 100%;
+          border-radius: 0.875rem;
+        }
+
+        .modal-content {
+          padding: 1.75rem;
+          width: 95%;
+          border-radius: 1.5rem;
+        }
+
+        .toast {
+          bottom: 1rem;
+          right: 1rem;
+          left: 1rem;
+          width: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-content">
+        <div class="header-badge">🏆 PREMIUM DENTAL CLINIC MANAGEMENT</div>
+        
+        <div class="header-icons">
+          <div class="header-icon">🦷</div>
+          <div class="header-icon">✨</div>
+          <div class="header-icon">💎</div>
+        </div>
+        
+        <h1>DrMax</h1>
+        <p>Sistem de gestionare a programărilor - doctor 1</p>
+        
+        <div class="header-features">
+          <div class="header-feature">Programări Sigure</div>
+          <div class="header-feature">Sincronizare Automată</div>
+          <div class="header-feature">Interfață Premium</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="button-group">
+        <button class="button" onclick="openModal()">+ Adaugă Programare</button>
+        <button class="button button-danger" onclick="deleteAll()">Șterge Toate</button>
+      </div>
+
+      <div id="appointmentsList" class="appointments-list">
+        <div class="loading">Se încarcă<div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Adaugă Programare</h2>
+          <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+
+        <form id="appointmentForm" onsubmit="handleSubmit(event)">
+          <div class="form-group">
+            <label for="nume">Nume Pacient</label>
+            <input type="text" id="nume" name="nume" required />
+          </div>
+
+          <div class="form-group">
+            <label for="nrTelefon">Telefon</label>
+            <input type="tel" id="nrTelefon" name="nrTelefon" placeholder="Ex: 40790 342 380" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="data">Data Programării</label>
+            <input type="date" id="data" name="data" required />
+          </div>
+
+          <div class="form-group">
+            <label for="oraProgramarii">Ora Programării</label>
+            <input type="time" id="oraProgramarii" name="oraProgramarii" required />
+          </div>
+
+          <div class="form-group">
+            <label for="tipProgramare">Tip Programare</label>
+            <select id="tipProgramare" name="tipProgramare" required>
+              <option value="">Selectați tipul</option>
+              <option value="Curățare dentară">Curățare dentară</option>
+              <option value="Examinare generală">Examinare generală</option>
+              <option value="Tratament carie">Tratament carie</option>
+              <option value="Detartraj">Detartraj</option>
+              <option value="Albire dentară">Albire dentară</option>
+              <option value="Implant dentar">Implant dentar</option>
+              <option value="Altele">Altele</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="notite">Note Speciale</label>
+            <textarea id="notite" name="notite"></textarea>
+          </div>
+
+          <button type="submit" class="button" style="width: 100%;">Adaugă Programare</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const API_URL = '/api';
+
+      function openModal() {
+        document.getElementById('modal').classList.add('active');
+      }
+
+      function closeModal() {
+        document.getElementById('modal').classList.remove('active');
+        document.getElementById('appointmentForm').reset();
+      }
+
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.remove();
+        }, 3500);
+      }
+
+      async function handleSubmit(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData);
+
+        // Convert date format from YYYY-MM-DD to DD.MM.YYYY
+        const [year, month, day] = data.data.split('-');
+        data.data = `${day}.${month}.${year}`;
+
+        try {
+          const response = await fetch(`${API_URL}/appointments`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to add appointment');
+          }
+
+          showToast('Programare adăugată și salvată în Google Sheets!', 'success');
+          closeModal();
+          loadAppointments();
+        } catch (error) {
+          console.error('Error:', error);
+          showToast('Eroare la adăugarea programării', 'error');
+        }
+      }
+
+      async function loadAppointments() {
+        try {
+          const response = await fetch(`${API_URL}/appointments`);
+          if (!response.ok) {
+            throw new Error('Failed to load appointments');
+          }
+
+          const appointments = await response.json();
+          const container = document.getElementById('appointmentsList');
+
+          if (appointments.length === 0) {
+            container.innerHTML = `
+              <div class="empty-state">
+                <div class="empty-state-icon">📅</div>
+                <p>Nu sunt programări adăugate încă</p>
+                <p>Apăsați butonul de mai sus pentru a adăuga o programare</p>
+              </div>
+            `;
+            return;
+          }
+
+          container.innerHTML = appointments
+            .map(
+              (apt) => `
+            <div class="appointment-card">
+              <div class="appointment-info">
+                <div class="appointment-name">${apt.nume}</div>
+                <div class="appointment-detail">📞 ${apt.nrTelefon}</div>
+                <div class="appointment-detail">📧 ${apt.email}</div>
+                <div class="appointment-detail">📅 ${apt.data} la ${apt.oraProgramarii}</div>
+                <div class="appointment-detail">🏥 ${apt.tipProgramare}</div>
+                ${apt.notite ? `<div class="appointment-detail">📝 ${apt.notite}</div>` : ''}
+              </div>
+              <div class="appointment-actions">
+                <button class="delete-btn" onclick="deleteAppointment('${apt.id}')">Șterge</button>
+              </div>
+            </div>
+          `
+            )
+            .join('');
+        } catch (error) {
+          console.error('Error loading appointments:', error);
+          document.getElementById('appointmentsList').innerHTML =
+            '<div class="empty-state"><p>Eroare la încărcarea programărilor</p></div>';
+        }
+      }
+
+      async function deleteAppointment(id) {
+        if (!confirm('Sunteți sigur că doriți să ștergeți această programare?')) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/appointments/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to delete appointment');
+          }
+
+          showToast('Programare ștearsă', 'success');
+          loadAppointments();
+        } catch (error) {
+          console.error('Error:', error);
+          showToast('Eroare la ștergerea programării', 'error');
+        }
+      }
+
+      async function deleteAll() {
+        if (!confirm('Sunteți sigur că doriți să ștergeți TOATE programările?')) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/appointments`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to delete all appointments');
+          }
+
+          showToast('Toate programările au fost șterse', 'success');
+          loadAppointments();
+        } catch (error) {
+          console.error('Error:', error);
+          showToast('Eroare la ștergerea programărilor', 'error');
+        }
+      }
+
+      // Load appointments on page load
+      loadAppointments();
+
+      // Close modal when clicking outside
+      window.onclick = function (event) {
+        const modal = document.getElementById('modal');
+        if (event.target === modal) {
+          closeModal();
+        }
+      };
+    </script>
+  </body>
+</html>
