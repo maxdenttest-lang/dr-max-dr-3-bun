@@ -595,10 +595,31 @@
     </div>
 
     <div class="container">
-      <div class="button-group">
-        <button class="button" onclick="openModal()">+ Adaugă Programare</button>
-        <button class="button button-danger" onclick="deleteAll()">Șterge Toate</button>
-      </div>
+     <div class="button-group">
+
+  <button class="button" onclick="openModal()">+ Adaugă Programare</button>
+
+  <button class="button button-danger" onclick="deleteAll()">Șterge Toate</button>
+
+</div>
+
+<div
+
+  id="daysNavigation"
+
+  style="
+
+    display:flex;
+
+    gap:10px;
+  
+    flex-wrap:wrap;
+
+    margin-bottom:2rem;
+
+  "
+
+></div>
 
       <div id="appointmentsList" class="appointments-list">
         <div class="loading">Se încarcă<div class="spinner"></div></div>
@@ -639,7 +660,7 @@
             <input type="time" id="oraProgramarii" name="oraProgramarii" required />
           </div>
 
-          <div class="form-group">
+         <div class="form-group">
   <label for="tipProgramare">Tip Programare</label>
   <input 
     type="text" 
@@ -660,162 +681,384 @@
       </div>
     </div>
 
-    <script>
-      const API_URL = '/api';
+   <script>
+  const API_URL = '/api';
 
-      function openModal() {
-        document.getElementById('modal').classList.add('active');
+  function openModal() {
+    document.getElementById('modal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+    document.getElementById('appointmentForm').reset();
+  }
+
+  function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 3500);
+  }
+
+  function getSelectedDate() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('date');
+  }
+
+  function setSelectedDate(date) {
+    window.location.href = `?date=${date}`;
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+
+    const [year, month, day] = data.data.split('-');
+    data.data = `${day}.${month}.${year}`;
+
+    try {
+
+      const response = await fetch(`${API_URL}/appointments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed');
       }
 
-      function closeModal() {
-        document.getElementById('modal').classList.remove('active');
-        document.getElementById('appointmentForm').reset();
-      }
+      showToast(
+        'Programare adăugată și salvată în Google Sheets!',
+        'success'
+      );
 
-      function showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        document.body.appendChild(toast);
+      closeModal();
 
-        setTimeout(() => {
-          toast.remove();
-        }, 3500);
-      }
-
-      async function handleSubmit(event) {
-        event.preventDefault();
-
-        const formData = new FormData(event.target);
-        const data = Object.fromEntries(formData);
-
-        // Convert date format from YYYY-MM-DD to DD.MM.YYYY
-        const [year, month, day] = data.data.split('-');
-        data.data = `${day}.${month}.${year}`;
-
-        try {
-          const response = await fetch(`${API_URL}/appointments`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to add appointment');
-          }
-
-          showToast('Programare adăugată și salvată în Google Sheets!', 'success');
-          closeModal();
-          loadAppointments();
-        } catch (error) {
-          console.error('Error:', error);
-          showToast('Eroare la adăugarea programării', 'error');
-        }
-      }
-
-      async function loadAppointments() {
-        try {
-          const response = await fetch(`${API_URL}/appointments`);
-          if (!response.ok) {
-            throw new Error('Failed to load appointments');
-          }
-
-          const appointments = await response.json();
-          const container = document.getElementById('appointmentsList');
-
-          if (appointments.length === 0) {
-            container.innerHTML = `
-              <div class="empty-state">
-                <div class="empty-state-icon">📅</div>
-                <p>Nu sunt programări adăugate încă</p>
-                <p>Apăsați butonul de mai sus pentru a adăuga o programare</p>
-              </div>
-            `;
-            return;
-          }
-
-          container.innerHTML = appointments
-            .map(
-              (apt) => `
-            <div class="appointment-card">
-              <div class="appointment-info">
-                <div class="appointment-name">${apt.nume}</div>
-                <div class="appointment-detail">📞 ${apt.nrTelefon}</div>
-                <div class="appointment-detail">📧 ${apt.email}</div>
-                <div class="appointment-detail">📅 ${apt.data} la ${apt.oraProgramarii}</div>
-                <div class="appointment-detail">🏥 ${apt.tipProgramare}</div>
-                ${apt.notite ? `<div class="appointment-detail">📝 ${apt.notite}</div>` : ''}
-              </div>
-              <div class="appointment-actions">
-                <button class="delete-btn" onclick="deleteAppointment('${apt.id}')">Șterge</button>
-              </div>
-            </div>
-          `
-            )
-            .join('');
-        } catch (error) {
-          console.error('Error loading appointments:', error);
-          document.getElementById('appointmentsList').innerHTML =
-            '<div class="empty-state"><p>Eroare la încărcarea programărilor</p></div>';
-        }
-      }
-
-      async function deleteAppointment(id) {
-        if (!confirm('Sunteți sigur că doriți să ștergeți această programare?')) {
-          return;
-        }
-
-        try {
-          const response = await fetch(`${API_URL}/appointments/${id}`, {
-            method: 'DELETE',
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to delete appointment');
-          }
-
-          showToast('Programare ștearsă', 'success');
-          loadAppointments();
-        } catch (error) {
-          console.error('Error:', error);
-          showToast('Eroare la ștergerea programării', 'error');
-        }
-      }
-
-      async function deleteAll() {
-        if (!confirm('Sunteți sigur că doriți să ștergeți TOATE programările?')) {
-          return;
-        }
-
-        try {
-          const response = await fetch(`${API_URL}/appointments`, {
-            method: 'DELETE',
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to delete all appointments');
-          }
-
-          showToast('Toate programările au fost șterse', 'success');
-          loadAppointments();
-        } catch (error) {
-          console.error('Error:', error);
-          showToast('Eroare la ștergerea programărilor', 'error');
-        }
-      }
-
-      // Load appointments on page load
       loadAppointments();
 
-      // Close modal when clicking outside
-      window.onclick = function (event) {
-        const modal = document.getElementById('modal');
-        if (event.target === modal) {
-          closeModal();
+    } catch (error) {
+
+      console.error(error);
+
+      showToast(
+        'Eroare la adăugarea programării',
+        'error'
+      );
+    }
+  }
+
+  async function loadAppointments() {
+
+    try {
+
+      const response = await fetch(`${API_URL}/appointments`);
+
+      if (!response.ok) {
+        throw new Error('Failed');
+      }
+
+      const appointments = await response.json();
+
+      const container =
+        document.getElementById('appointmentsList');
+
+      const nav =
+        document.getElementById('daysNavigation');
+
+      if (appointments.length === 0) {
+
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📅</div>
+            <p>Nu există programări</p>
+          </div>
+        `;
+
+        return;
+      }
+
+      // Grupare pe zile
+      const grouped = {};
+
+      appointments.forEach((apt) => {
+
+        if (!grouped[apt.data]) {
+          grouped[apt.data] = [];
         }
-      };
-    </script>
+
+        grouped[apt.data].push(apt);
+      });
+
+      // Sortare zile
+      const sortedDates =
+        Object.keys(grouped).sort((a, b) => {
+
+          const [d1, m1, y1] = a.split('.');
+          const [d2, m2, y2] = b.split('.');
+
+          return (
+            new Date(`${y2}-${m2}-${d2}`) -
+            new Date(`${y1}-${m1}-${d1}`)
+          );
+        });
+if (sortedDates.length === 0) {
+
+  container.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-state-icon">📅</div>
+      <p>Nu există programări</p>
+    </div>
+  `;
+
+  window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+  );
+
+  return;
+}
+      // NAVIGARE
+      nav.innerHTML = sortedDates.map((date) => {
+
+        const active =
+          getSelectedDate() === date ||
+          (!getSelectedDate() && date === sortedDates[0]);
+
+        return `
+          <button
+            onclick="setSelectedDate('${date}')"
+            style="
+              padding:10px 16px;
+              border:none;
+              border-radius:12px;
+              cursor:pointer;
+              font-weight:600;
+              background:${active ? '#0d7377' : '#ffffff'};
+              color:${active ? '#ffffff' : '#111827'};
+              box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            "
+          >
+            ${date}
+          </button>
+        `;
+      }).join('');
+
+      // Zi selectată
+     let selectedDate =
+  getSelectedDate() || sortedDates[0];
+
+// dacă data din URL nu mai există
+if (!grouped[selectedDate]) {
+
+  selectedDate = sortedDates[0];
+
+  window.history.replaceState(
+    {},
+    document.title,
+    `?date=${selectedDate}`
+  );
+}
+
+      const selectedAppointments =
+        grouped[selectedDate] || [];
+
+      // Sortare ore
+      selectedAppointments.sort((a, b) => {
+        return a.oraProgramarii.localeCompare(
+          b.oraProgramarii
+        );
+      });
+
+      container.innerHTML = `
+        <div
+          style="
+            font-size:1.5rem;
+            font-weight:700;
+            margin-bottom:1.5rem;
+          "
+        >
+          📅 ${selectedDate}
+        </div>
+
+        <div
+          style="
+            display:grid;
+            gap:1rem;
+          "
+        >
+          ${selectedAppointments.map((apt) => {
+
+            return `
+              <div class="appointment-card">
+
+                <div class="appointment-info">
+
+                  <div class="appointment-name">
+                    ${apt.nume}
+                  </div>
+
+                  <div class="appointment-detail">
+                    📞 ${apt.nrTelefon}
+                  </div>
+
+                  <div class="appointment-detail">
+                    📧 ${apt.email}
+                  </div>
+
+                  <div class="appointment-detail">
+                    ⏰ ${apt.oraProgramarii}
+                  </div>
+
+                  <div class="appointment-detail">
+                    🏥 ${apt.tipProgramare}
+                  </div>
+
+                  ${
+                    apt.notite
+                    ? `
+                      <div class="appointment-detail">
+                        📝 ${apt.notite}
+                      </div>
+                    `
+                    : ''
+                  }
+
+                </div>
+
+                <div class="appointment-actions">
+
+                  <button
+                    class="delete-btn"
+                    onclick="deleteAppointment('${apt.id}')"
+                  >
+                    Șterge
+                  </button>
+
+                </div>
+
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+    } catch (error) {
+
+      console.error(error);
+
+      document.getElementById(
+        'appointmentsList'
+      ).innerHTML = `
+        <div class="empty-state">
+          <p>Eroare la încărcare</p>
+        </div>
+      `;
+    }
+  }
+
+  async function deleteAppointment(id) {
+
+    if (
+      !confirm(
+        'Sunteți sigur că doriți să ștergeți această programare?'
+      )
+    ) {
+      return;
+    }
+
+    try {
+
+      const response = await fetch(
+        `${API_URL}/appointments/${id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed');
+      }
+
+      showToast('Programare ștearsă', 'success');
+
+      loadAppointments();
+
+    } catch (error) {
+
+      console.error(error);
+
+      showToast('Eroare', 'error');
+    }
+  }
+
+  async function deleteAll() {
+
+    if (
+      !confirm(
+        'Sunteți sigur că doriți să ștergeți TOATE programările?'
+      )
+    ) {
+      return;
+    }
+
+    try {
+
+      const response = await fetch(
+        `${API_URL}/appointments`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed');
+      }
+
+     showToast(
+  'Toate programările au fost șterse',
+  'success'
+);
+
+// curăță URL-ul
+window.history.replaceState(
+  {},
+  document.title,
+  window.location.pathname
+);
+
+// reîncarcă lista
+loadAppointments();
+    } catch (error) {
+
+      console.error(error);
+
+      showToast('Eroare', 'error');
+    }
+  }
+
+  loadAppointments();
+
+  window.onclick = function (event) {
+
+    const modal =
+      document.getElementById('modal');
+
+    if (event.target === modal) {
+      closeModal();
+    }
+  };
+</script>
   </body>
 </html>
